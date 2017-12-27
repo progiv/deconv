@@ -99,3 +99,9 @@ ENV/
 
 # mypy
 .mypy_cache/
+
+# libreoffice lock
+.~lock*
+
+# output images
+output*
