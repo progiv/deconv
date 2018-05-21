@@ -2,12 +2,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from scipy.signal import convolve2d #fftconvolve
-from numpy.fft import fftn, ifftn
 from scipy.ndimage import filters
+from numpy.fft import fftn, ifftn
 from itertools import chain
 from skimage.draw import line_aa
+from skimage.measure import compare_psnr
 from math import sin, cos, pi, factorial
-import math
 
 def edgetaper(I, psf):
     """
@@ -183,7 +183,7 @@ def bezier_psf_aa(points, n=100):
     print(points)
     curve = bezier_curve_range(n, points)
     Y, X = zip(*[p for p in curve])
-    psf = np.zeros((int(np.ceil(np.max(X)+2)), int(np.ceil(np.max(Y)+2))))
+    psf = np.zeros((int(np.ceil(np.max(Y)+2)), int(np.ceil(np.max(X)+2))))
 
     triangle_fun = lambda x: np.maximum(0, (1 - np.abs(x)))
     triangle_fun_prod = lambda x, y: np.multiply(triangle_fun(x), triangle_fun(y))
