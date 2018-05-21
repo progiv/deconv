@@ -179,39 +179,41 @@ def bezier_psf(points, n=100):
     psf /= psf.sum()
     return psf
 
+def bezier_psf_aa(points, n=100):
+    print(points)
+    curve = bezier_curve_range(n, points)
+    Y, X = zip(*[p for p in curve])
+    psf = np.zeros((int(np.ceil(np.max(X)+2)), int(np.ceil(np.max(Y)+2))))
+
+    triangle_fun = lambda x: np.maximum(0, (1 - np.abs(x)))
+    triangle_fun_prod = lambda x, y: np.multiply(triangle_fun(x), triangle_fun(y))
+    triangle_fun_curve = lambda x, X: np.array([max(np.maximum(0, 1-np.abs(X-xx))) for xx in x])
+    triangle_fun_curve2 = lambda x, y, X, Y: np.sqrt(triangle_fun_curve(x, X)**2  + triangle_fun_curve(y, Y)**2)
+
+    x1 = np.floor(X).astype(np.int)
+    x2 = x1+1
+    y1 = np.floor(Y).astype(np.int)
+    y2 = y1+1
+
+    psf[y1, x1] += triangle_fun_curve2(X, Y, x1, y1)
+    psf[y2, x1] += triangle_fun_curve2(X, Y, x1, y2)
+    psf[y1, x2] += triangle_fun_curve2(X, Y, x2, y1)
+    psf[y2, x2] += triangle_fun_curve2(X, Y, x2, y2)
+
+    return psf/psf.sum()
+
 def bezier_psf2(points, n=100):
     x = [0] + points[::2]
     y = [0] + points[1::2]
     xy = list(zip(x, y))
-    return bezier_psf(xy, n=n)
+    return bezier_psf_aa(xy, n=n)
 
-def curved_psf():
-    eps = 1e-16
-    p0 = np.random.randint(6, 25)
-    p1 = np.random.randint(6, 21)
-
-    x = np.random.randint(0, p0, 4)#sort(randi([0 p0], 1, 4));
-    y = np.random.randint(0, p1, 4)
-
-    pt1 = [[x[0]], [y[0]]]
-    pt2 = [[x[1]], [y[1]]]
-    pt3 = [[x[2]], [y[2]]]
-    pt4 = [[x[3]], [y[3]]]
-
-    t = np.linspace(0, 1, p0)
-    pts = np.kron((1-t) ** 3, pt1) + np.kron(3*(1-t)**2 * t, pt2) + np.kron(3 * (1-t) * t**2, pt3) + np.kron(t**3, pt4)
-    x1 = np.arange(1, p0+1)
-    y1 = np.round(pts[1, :]).astype(np.int64)
-    y1 = y1 - min(y1) + 1
-    #plot(x1,y1)
-    pp = np.max(y1)
-    PSF = np.zeros((p0, len(x1)))
-
-    print(len(x1), PSF.shape)
-
-    for ind_x in range(len(x1)):
-        yy = max(len(x1) - y1[ind_x], 1)
-        PSF[yy, ind_x] = np.random.rand()
-
-    PSF = PSF/(sum(PSF.ravel()) + eps*p0*p0)
-    return PSF
+def compare_psnr_crop(im_true, im_test, crop_area=20, **kwargs):
+    if crop_area is None:
+        return compare_psnr(im_true, im_test, **kwargs)
+    elif isinstance(crop_area, int):
+        return compare_psnr(im_true[crop_area:-crop_area, crop_area:-crop_area],
+                            im_test[crop_area:-crop_area, crop_area:-crop_area], **kwargs)
+    else:
+        return compare_psnr(im_true[crop_area[0]:crop_area[1], crop_area[2]:crop_area[3]],
+                            im_test[crop_area[0]:crop_area[1], crop_area[2]:crop_area[3]], **kwargs)
