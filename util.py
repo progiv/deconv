@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 
 from scipy.signal import convolve2d #fftconvolve
 from scipy.ndimage import filters
+from scipy.optimize import OptimizeResult
 from numpy.fft import fftn, ifftn
 from itertools import chain
 from skimage.draw import line_aa
@@ -270,18 +271,17 @@ def bezier_curve_range(n, points):
         yield bezier(t, points)
 
 def bezier_psf(points, n=100):
-    print(points)
+    #print(points)
     curve = bezier_curve_range(n, points)
     r, c = zip(*[p for p in curve])
     psf = np.zeros((int(np.ceil(np.max(r)+1)), int(np.ceil(np.max(c)+1))))
     for rr, cc in zip(r,c):
         psf[rr, cc] += 1
-#     psf[r,c] = 1
     psf /= psf.sum()
     return psf
 
 def bezier_psf_aa(points, n=100):
-    print(points)
+    #print(points)
     curve = bezier_curve_range(n, points)
     Y, X = zip(*[p for p in curve])
     Y -= np.min(Y)
@@ -321,28 +321,110 @@ def compare_psnr_crop(im_true, im_test, crop_area=20, **kwargs):
         return compare_psnr(im_true[crop_area[0]:crop_area[1], crop_area[2]:crop_area[3]],
                             im_test[crop_area[0]:crop_area[1], crop_area[2]:crop_area[3]], **kwargs)
 
-def minimize_grad(fun, x0, grad=None, alpha=.5, ftol = 1e-9):
+"""
+def minimize_grad(fun, x0, grad=None, alpha=3, ftol = 1e-9, maxit=50, disp=False):
     def gradient(x, step=1):
-        """suppose x is of size 2"""
+        "suppose x is of size 2"
         df = np.zeros(x.shape)
-        with Pool(processes=4) as pool:
-            for coord in range(x.size):
-                dx = np.zeros(x.shape)
-                dx[coord] = step
-                df[coord] = (fun(x + dx) - fun(x - dx)) / (2 * step)
+        for coord in range(x.size):
+            dx = np.zeros(x.shape)
+            dx[coord] = step
+            df[coord] = (fun(x + dx) - fun(x - dx)) / (2 * step)
         return df
+    def gradient2(x):
+        fval = np.zeros((3,3))
+        for dy in range(-1, 2):
+            for dx in range(-1, 2):
+                if not(dx == 0 and dy == 0):
+                    fval[dy+1, dx+1] = fun(x+np.array([dx, dy]))
+        sobel = np.array([[-1, 0, 1],
+                          [-2, 0, 2],
+                          [-1, 0, 1]])
+        scale = np.sum(np.abs(sobel))
+        dfdy = np.sum(fval * sobel.T)
+        dfdx = np.sum(fval * sobel)
+        G = np.array([dfdx, dfdy])
+        return G# / np.sum(np.abs(G))
+    
     if grad is None:
-        grad = gradient
+        grad = gradient2
     
     fin = False
     x = x0
     prev_f = fun(x)
+    iterations = 0
     while not fin:
+        iterations += 1
         df = grad(x)
-        print(x, alpha, df)
+        if disp:
+            print(x, alpha, df)
         x = x - alpha*df
+        #alpha *= .7
         cur_f = fun(x)
-        if abs(cur_f - prev_f) < ftol:
+        if iterations == maxit or np.sum(np.abs(df))<ftol:#abs(cur_f - prev_f) < ftol:
             fin = True
         prev_f = cur_f
-    return OptimizeResult(x=x)
+    return OptimizeResult(x=x, nit=iterations)
+"""
+def minimize_grad(fun, x0, grad=None, alpha=3, ftol = 1e-9, xtol=1e-3, maxit=50, disp=False):
+    def gradient(x, step=1):
+        """suppose x is of size 2"""
+        df = np.zeros(x.shape)
+        for coord in range(x.size):
+            dx = np.zeros(x.shape)
+            dx[coord] = step
+            df[coord] = (fun(x + dx) - fun(x - dx)) / (2 * step)
+        return df
+    def gradient2(x):
+        fval = np.zeros((3,3))
+        for dy in range(-1, 2):
+            for dx in range(-1, 2):
+                if not(dx == 0 and dy == 0):
+                    fval[dy+1, dx+1] = fun(x+np.array([dx, dy]))
+        sobel = np.array([[-1, 0, 1],
+                          [-2, 0, 2],
+                          [-1, 0, 1]])
+        scale = np.sum(np.abs(sobel))
+        dfdy = np.sum(fval * sobel.T)
+        dfdx = np.sum(fval * sobel)
+        G = np.array([dfdx, dfdy])
+        return G# / np.sum(np.abs(G))
+    
+    if grad is None:
+        grad = gradient2
+    
+    fin = False
+    x = x0
+    prev_f = fun(x)
+    iterations = 0
+    nfev = 0
+    prev_x = x
+    
+    #gradient loop
+    while not fin:
+        iterations += 1
+        df = grad(x)
+        nfev += 8
+        
+        if disp:
+            print(x, prev_f, df)
+        # optimal loop
+        fin2 = False
+        lamb = alpha
+        while np.sum(np.abs(lamb*df)) > xtol:
+            x1 = x - lamb*df
+            cur_f = fun(x1)
+            nfev += 1
+            if cur_f < prev_f:
+                x = x1
+                prev_f= cur_f
+            else:
+                lamb *= -1/2
+        #alpha *= .7
+        #cur_f = fun(x)
+        print(prev_x, x)
+        if iterations >= maxit or np.sum(np.abs(df))<ftol or np.sum(np.abs(prev_x-x))< xtol:
+            fin = True
+        prev_x = x
+        prev_f = cur_f
+    return OptimizeResult(x=x, nit=iterations, nfev=nfev)

@@ -89,7 +89,7 @@ def richardson_lucy_matlab(image, psf, iterations=50, dampar=0, weight=None, rea
         cc = corelucy(Y, psf, dampar22, wI, readout, eps, convolvemethod)
         
         # 3.c Determine next iteration image and apply poitivity constraint
-        prev_prev_image = prev_image.copy()
+        prev_prev_image = prev_image
         prev_image = np.maximum(Y * np.real(convolvemethod(cc, psf_mirror, 'same')) / scale, 0)#np.conj(psf)
         if clip:
             prev_image[prev_image > 1] = 1
