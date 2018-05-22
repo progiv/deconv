@@ -9,6 +9,106 @@ from skimage.draw import line_aa
 from skimage.measure import compare_psnr
 from math import sin, cos, pi, factorial
 
+def zero_pad(image, shape, position='corner'):
+    """
+    Extends image to a certain size with zeros
+    Parameters
+    ----------
+    image: real 2d `numpy.ndarray`
+        Input image
+    shape: tuple of int
+        Desired output shape of the image
+    position : str, optional
+        The position of the input image in the output one:
+            * 'corner'
+                top-left corner (default)
+            * 'center'
+                centered
+    Returns
+    -------
+    padded_img: real `numpy.ndarray`
+        The zero-padded image
+    """
+    shape = np.asarray(shape, dtype=int)
+    imshape = np.asarray(image.shape, dtype=int)
+
+    if np.alltrue(imshape == shape):
+        return image
+
+    if np.any(shape <= 0):
+        raise ValueError("ZERO_PAD: null or negative shape given")
+
+    dshape = shape - imshape
+    if np.any(dshape < 0):
+        raise ValueError("ZERO_PAD: target size smaller than source one")
+
+    pad_img = np.zeros(shape, dtype=image.dtype)
+
+    idx, idy = np.indices(imshape)
+
+    if position == 'center':
+        if np.any(dshape % 2 != 0):
+            raise ValueError("ZERO_PAD: source and target shapes "
+                             "have different parity.")
+        offx, offy = dshape // 2
+    else:
+        offx, offy = (0, 0)
+
+    pad_img[idx + offx, idy + offy] = image
+
+    return pad_img
+
+def psf2otf(psf, shape):
+    """
+    Convert point-spread function to optical transfer function.
+    Compute the Fast Fourier Transform (FFT) of the point-spread
+    function (PSF) array and creates the optical transfer function (OTF)
+    array that is not influenced by the PSF off-centering.
+    By default, the OTF array is the same size as the PSF array.
+    To ensure that the OTF is not altered due to PSF off-centering, PSF2OTF
+    post-pads the PSF array (down or to the right) with zeros to match
+    dimensions specified in OUTSIZE, then circularly shifts the values of
+    the PSF array up (or to the left) until the central pixel reaches (1,1)
+    position.
+    Parameters
+    ----------
+    psf : `numpy.ndarray`
+        PSF array
+    shape : int
+        Output shape of the OTF array
+    Returns
+    -------
+    otf : `numpy.ndarray`
+        OTF array
+    Notes
+    -----
+    Adapted from MATLAB psf2otf function
+    """
+    if np.all(psf == 0):
+        return np.zeros_like(psf)
+
+    inshape = psf.shape
+    # Pad the PSF to outsize
+    psf = zero_pad(psf, shape, position='corner')
+
+    # Circularly shift OTF so that the 'center' of the PSF is
+    # [0,0] element of the array
+    for axis, axis_size in enumerate(inshape):
+        psf = np.roll(psf, -int(axis_size / 2), axis=axis)
+
+    # Compute the OTF
+    otf = np.fft.fft2(psf)
+
+    # Estimate the rough number of operations involved in the FFT
+    # and discard the PSF imaginary part if within roundoff error
+    # roundoff error  = machine epsilon = sys.float_info.epsilon
+    # or np.finfo().eps
+    n_ops = np.sum(psf.size * np.log2(psf.shape))
+    otf = np.real_if_close(otf, tol=n_ops)
+
+    return otf
+
+
 def edgetaper(I, psf):
     """
     J = EDGETAPER(I,PSF) blurs the edges of image I using the point-spread
@@ -16,11 +116,11 @@ def edgetaper(I, psf):
     image I and its blurred version. The weighting array, determined by the
     autocorrelation function of PSF, makes J equal to I in its central
     region, and equal to the blurred version of I near the edges.
-    
+
     The EDGETAPER function reduces the ringing effect in image deblurring
     methods that use the discrete Fourier transform, such as DECONWNR,
     DECONVREG, and DECONVLUCY.
-    
+
     Note that the size of the PSF cannot exceed half of the image size in any
     dimension.
     """
@@ -39,14 +139,15 @@ def edgetaper(I, psf):
         z = np.real(ifftn(np.abs(fftn(PSFproj, (I.shape[n] - 1,)))**2))
         z = z/np.max(z)
         beta[n] = np.append(z, z[0])
-    
+
     if numDim == 1:
         alpha = 1 - beta[0]
     else: # n == 2:
         alpha = np.matmul((1-beta[0]).reshape((I.shape[0], 1)), (1 - beta[1]).reshape(1, I.shape[1]))
     # n > 2 - not implemented
-    
-    blurred = convolve2d(I, psf, 'same', 'wrap')#, 'symm')
+    otf = psf2otf(psf, I.shape);
+    blurred = np.real(ifftn(fftn(I)*otf))
+    #blurred = convolve2d(I, psf, 'same', 'wrap')#, 'symm')
     J = alpha * I + (1-alpha)*blurred
 
     return np.clip(J, np.min(I), np.max(I))
@@ -111,10 +212,10 @@ def motion_blur_psf_my(length=10, angle=pi/4, n_points=1000, **kwargs):
         y_start -= y_end
         y_end = 0
     psf = np.zeros((int(max(y_start, y_end))+2, int(max(x_start, x_end))+2))
-    
+
     triangle_fun = lambda x: np.maximum(0, (1 - np.abs(x)))
     triangle_fun_prod = lambda x, y: np.multiply(triangle_fun(x), triangle_fun(y))
-    
+
     X = np.linspace(x_start, x_end, n_points)
     Y = np.linspace(y_start, y_end, n_points)
     x1 = np.floor(X).astype(np.int)
@@ -183,6 +284,8 @@ def bezier_psf_aa(points, n=100):
     print(points)
     curve = bezier_curve_range(n, points)
     Y, X = zip(*[p for p in curve])
+    Y -= np.min(Y)
+    X -= np.min(X)
     psf = np.zeros((int(np.ceil(np.max(Y)+2)), int(np.ceil(np.max(X)+2))))
 
     triangle_fun = lambda x: np.maximum(0, (1 - np.abs(x)))
@@ -217,3 +320,29 @@ def compare_psnr_crop(im_true, im_test, crop_area=20, **kwargs):
     else:
         return compare_psnr(im_true[crop_area[0]:crop_area[1], crop_area[2]:crop_area[3]],
                             im_test[crop_area[0]:crop_area[1], crop_area[2]:crop_area[3]], **kwargs)
+
+def minimize_grad(fun, x0, grad=None, alpha=.5, ftol = 1e-9):
+    def gradient(x, step=1):
+        """suppose x is of size 2"""
+        df = np.zeros(x.shape)
+        with Pool(processes=4) as pool:
+            for coord in range(x.size):
+                dx = np.zeros(x.shape)
+                dx[coord] = step
+                df[coord] = (fun(x + dx) - fun(x - dx)) / (2 * step)
+        return df
+    if grad is None:
+        grad = gradient
+    
+    fin = False
+    x = x0
+    prev_f = fun(x)
+    while not fin:
+        df = grad(x)
+        print(x, alpha, df)
+        x = x - alpha*df
+        cur_f = fun(x)
+        if abs(cur_f - prev_f) < ftol:
+            fin = True
+        prev_f = cur_f
+    return OptimizeResult(x=x)
