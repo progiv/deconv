@@ -153,7 +153,7 @@ def edgetaper(I, psf):
 
     return np.clip(J, np.min(I), np.max(I))
 
-def show_results(original, noisy, result, titles=['Original Data', 'Blurred data', 'Restoration using\nRichardson-Lucy']):
+def show_results(original, noisy, result, titles=['Original Data', 'Blurred data', 'Restoration using\nRichardson-Lucy'], savefig=None):
     # Show results
     fig, ax = plt.subplots(nrows=1, ncols=3, figsize=(12, 10))
     plt.gray()
@@ -173,6 +173,8 @@ def show_results(original, noisy, result, titles=['Original Data', 'Blurred data
 
     fig.subplots_adjust(wspace=0.02, hspace=0.2,
                         top=0.9, bottom=0.05, left=0, right=1)
+    if savefig is not None:
+        plt.savefig(savefig)
     plt.show()
 
 def gkern2(kernlen=21, nsig=3):
@@ -269,7 +271,7 @@ def bezier_curve_range(n, points):
     for i in range(n):
         t = i / float(n - 1)
         yield bezier(t, points)
-
+"""
 def bezier_psf(points, n=100):
     #print(points)
     curve = bezier_curve_range(n, points)
@@ -279,11 +281,12 @@ def bezier_psf(points, n=100):
         psf[rr, cc] += 1
     psf /= psf.sum()
     return psf
+"""
 
 def bezier_psf_aa(points, n=100):
     #print(points)
     curve = bezier_curve_range(n, points)
-    Y, X = zip(*[p for p in curve])
+    X, Y = zip(*[p for p in curve])
     Y -= np.min(Y)
     X -= np.min(X)
     psf = np.zeros((int(np.ceil(np.max(Y)+2)), int(np.ceil(np.max(X)+2))))
@@ -302,16 +305,15 @@ def bezier_psf_aa(points, n=100):
     psf[y2, x1] += triangle_fun_curve2(X, Y, x1, y2)
     psf[y1, x2] += triangle_fun_curve2(X, Y, x2, y1)
     psf[y2, x2] += triangle_fun_curve2(X, Y, x2, y2)
-
     return psf/psf.sum()
 
 def bezier_psf2(points, n=100):
-    x = [0] + points[::2]
-    y = [0] + points[1::2]
+    x = np.concatenate(([0], points[::2]))
+    y = np.concatenate(([0], points[1::2]))
     xy = list(zip(x, y))
     return bezier_psf_aa(xy, n=n)
 
-def compare_psnr_crop(im_true, im_test, crop_area=20, **kwargs):
+def compare_psnr_crop(im_true, im_test, crop_area=100, **kwargs):
     if crop_area is None:
         return compare_psnr(im_true, im_test, **kwargs)
     elif isinstance(crop_area, int):
@@ -366,7 +368,7 @@ def minimize_grad(fun, x0, grad=None, alpha=3, ftol = 1e-9, maxit=50, disp=False
         prev_f = cur_f
     return OptimizeResult(x=x, nit=iterations)
 """
-def minimize_grad(fun, x0, grad=None, alpha=3, ftol = 1e-9, xtol=1e-3, maxit=50, disp=False):
+def minimize_grad(fun, x0, grad=None, alpha=3, ftol = 1e-9, xtol=1e-4, maxit=50, disp=False):
     def gradient(x, step=1):
         """suppose x is of size 2"""
         df = np.zeros(x.shape)
@@ -395,7 +397,8 @@ def minimize_grad(fun, x0, grad=None, alpha=3, ftol = 1e-9, xtol=1e-3, maxit=50,
     
     fin = False
     x = x0
-    prev_f = fun(x)
+    cur_f = fun(x)
+    prev_f = cur_f
     iterations = 0
     nfev = 0
     prev_x = x
@@ -428,3 +431,6 @@ def minimize_grad(fun, x0, grad=None, alpha=3, ftol = 1e-9, xtol=1e-3, maxit=50,
         prev_x = x
         prev_f = cur_f
     return OptimizeResult(x=x, nit=iterations, nfev=nfev)
+
+def vec_len(x):
+    np.sqrt(np.sum(x**2))

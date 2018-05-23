@@ -69,7 +69,7 @@ def richardson_lucy_matlab(image, psf, iterations=50, dampar=0, weight=None, rea
         convolvemethod = fftconvolve
     else:
         convolvemethod = convolve2d
-    scale = convolve2d(weight, psf, 'same') + np.sqrt(eps)
+    scale = convolvemethod(weight, psf, 'same') + np.sqrt(eps)
     del weight
 
     dampar22 = np.square(dampar)/2
