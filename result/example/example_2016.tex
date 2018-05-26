@@ -1,0 +1,92 @@
+\documentclass[14pt, master, substylefile = miee_master.rtx]{disser}
+
+\usepackage[a4paper, includefoot, left=3cm, right=1cm, top=2cm, bottom=2cm, headsep=1cm, footskip=1cm]{geometry}
+
+\pagestyle{footcenter}
+\chapterpagestyle{footcenter}
+
+\usepackage[T2A]{fontenc}
+\usepackage[utf8x]{inputenc}
+\usepackage[english, russian]{babel}
+\ifpdf\usepackage{epstopdf}\fi
+\setcounter{tocdepth}{2}
+
+% вставлять используемые пакеты сюда
+% hyperref должен быть самым последним, иначе будут  баги с \chapter \section и \subsection
+
+\usepackage[
+pdfstartview   = FitH,
+bookmarksopen  = true,bookmarksopenlevel=0,
+plainpages     = false,pdfpagelabels,
+pagebackref    = true,
+pdftoolbar     = false,
+unicode,
+pdftex,
+hidelinks
+]{hyperref}
+
+
+
+
+\begin{document}
+    \institution{%
+        Министерство образования и науки Российской Федерации \\
+        Федеральное агентство по образованию \\
+        Федеральное государственное автономное образовательное учреждение\\ высшего образования «Национальный исследовательский университет \\«Московский институт электронной техники»\\
+        Факультет МПиТК\\
+        Кафедра ВМ-1
+    }
+%\title{ВЫПУСКНАЯ КВАЛИФИКАЦИОННАЯ РАБОТА}
+\title{ДИССЕРТАЦИЯ\\[-14pt]на соискание ученой степени\\МАГИСТРА}
+\topic{\normalfont\scshape %
+    FIXME <<Название>>}
+
+\coursenum{01.04.04}
+\course{Прикладная математика}
+\masterprog{Математические методы и моделирование\\ \>\ \ в естественнонаучной и технической сферах}
+\author{FIXME Автор}
+\group{ВМ-22}
+
+\sa {FIXME ФИО науч. рук.}
+\sastatus{FIXME Должность научн. рук.}
+\city{Москва}
+\date{2016}
+
+\maketitle
+
+\tableofcontents
+
+\intro
+
+Льем воду.
+
+Так как нужно 60-80 страниц.
+
+А это нелегко без нее.
+
+\chapter{Название главы}
+
+% пример цитирования
+В работе \cite{ARIMA} было сказано ...
+
+\section{Название секции}
+
+А в работе \cite{Allen} утверждалось ..., что является противоречием к работе \cite{ARIMA}
+
+\subsection{Название подсекции}
+
+Длинный-длинный абзац, в котором рассказывается про отношение пишущего все это человека к существующему мироустройству, порядку вещей, главному вопросу жизни, вселенной и всего такого.
+
+
+
+
+\conclusion
+
+Подводим заключение всей нашей эпопее по написанию ВКР.
+
+Также в данном пункте можно вставить благодарности людям, помогавшим в написании работы: маме, дяде Феде с соседнего подъезда и коту.
+
+\bibliographystyle{gost2008}
+\bibliography{biblio}
+
+\end{document}
