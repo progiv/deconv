@@ -433,4 +433,4 @@ def minimize_grad(fun, x0, grad=None, alpha=3, ftol = 1e-9, xtol=1e-4, maxit=50,
     return OptimizeResult(x=x, nit=iterations, nfev=nfev)
 
 def vec_len(x):
-    np.sqrt(np.sum(x**2))
+    return np.sqrt(np.sum(x**2))
