@@ -1,4 +1,4 @@
-\documentclass[14pt, bachelor]{disser}
+\documentclass[14pt, bachelor, substylefile=bachelor.rtx]{disser}%twoside, 
 
 \usepackage[a4paper, includefoot, left=3cm, right=1cm, top=2cm, bottom=2cm, headsep=1cm, footskip=1cm]{geometry}
 
@@ -10,6 +10,9 @@
 \usepackage[english, russian]{babel}
 \ifpdf\usepackage{epstopdf}\fi
 \setcounter{tocdepth}{2}
+
+\usepackage{comment}
+\usepackage{amssymb}
 
 % вставлять используемые пакеты сюда
 % hyperref должен быть самым последним, иначе будут  баги с \chapter \section и \subsection
@@ -25,7 +28,7 @@ pdftex,
 hidelinks
 ]{hyperref}
 
-
+\renewcommand{\leq}{\leqslant}
 
 
 \begin{document}
@@ -36,22 +39,22 @@ hidelinks
         Факультет МПиТК\\
         Кафедра ВМ-1
     }
-%\title{ВЫПУСКНАЯ КВАЛИФИКАЦИОННАЯ РАБОТА}
+\title{ВЫПУСКНАЯ КВАЛИФИКАЦИОННАЯ РАБОТА}
 %\title{ДИССЕРТАЦИЯ\\[-14pt]на соискание ученой степени\\МАГИСТРА}
 %\topic{\normalfont\scshape %
 %    FIXME <<Название>>}
-\topic{<<Оценка линейного искажающего оператора в задаче восстановления изображения>>}
+\topic{\normalfont\scshape<<Оценка линейного искажающего оператора в задаче восстановления изображения>>}
 
 \coursenum{01.04.04}
 \course{Прикладная математика}
 %\masterprog{Математические методы и моделирование\\ \>\ \ в естественнонаучной и технической сферах}
-\author{Иван Терентьев}
+\author{Терентьев И.~В.}
 \group{ВМ-40}
 
 %\apname{Прокофьев А.А.}
 
-\sa {Умняшкин С.В.}
-\sastatus{Профессор, д.ф.-м.н.}
+\sa {Умняшкин С.~В.}
+\sastatus{профессор, д.ф.-м.н.}
 \city{Москва}
 \date{2018}
 
@@ -67,20 +70,12 @@ hidelinks
 
 А это нелегко без нее.
 
-\chapter{Название главы}
+\input{chapter1_theory.tex}
 
-% пример цитирования
-В работе \cite{ARIMA} было сказано ...
-
-\section{Название секции}
-
-А в работе \cite{Allen} утверждалось ..., что является противоречием к работе \cite{ARIMA}
-
-\subsection{Название подсекции}
-
-Длинный-длинный абзац, в котором рассказывается про отношение пишущего все это человека к существующему мироустройству, порядку вещей, главному вопросу жизни, вселенной и всего такого.
+\chapter{Оценка линейного искажающего оператора}
 
 
+\chapter{Результаты экспериментов}
 
 
 \conclusion
@@ -93,3 +88,8 @@ hidelinks
 \bibliography{biblio}
 
 \end{document}
+
+%А в работе \cite{Allen} утверждалось ..., что является противоречием к работе \cite{ARIMA}
+
+% пример цитирования
+%В работе \cite{ARIMA} было сказано ...
