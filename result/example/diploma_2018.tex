@@ -1,4 +1,4 @@
-\documentclass[14pt, bachelor, substylefile=bachelor.rtx]{disser}%twoside, 
+\documentclass[14pt, bachelor, substylefile = bachelor.rtx]{disser}%twoside, 
 
 \usepackage[a4paper, includefoot, left=3cm, right=1cm, top=2cm, bottom=2cm, headsep=1cm, footskip=1cm]{geometry}
 
@@ -14,6 +14,10 @@
 
 \usepackage{comment}
 \usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{textcomp}
+\usepackage{tikz}
+\usetikzlibrary{shapes,arrows}
 
 % вставлять используемые пакеты сюда
 % hyperref должен быть самым последним, иначе будут  баги с \chapter \section и \subsection
@@ -34,50 +38,42 @@ hidelinks
 
 \begin{document}
     \institution{%
-        Министерство образования и науки Российской Федерации \\
-        Федеральное агентство по образованию \\
-        Федеральное государственное автономное образовательное учреждение\\ высшего образования «Национальный исследовательский университет \\«Московский институт электронной техники»\\
-        Факультет МПиТК\\
-        Кафедра ВМ-1
+        МИНОБРНАУКИ РОССИИ \\
+        Федеральное государственное автономное образовательное учреждение высшего образования\\
+        <<Национальный исследовательский университет\\
+        <<Московский институт электронной техники>>\\
+        Факультет Микроприборов и технической кибернетики (МПиТК)\\
+        Кафедра высшей математики №1 (ВМ-1)
     }
-\title{ВЫПУСКНАЯ КВАЛИФИКАЦИОННАЯ РАБОТА}
-%\title{ДИССЕРТАЦИЯ\\[-14pt]на соискание ученой степени\\МАГИСТРА}
-%\topic{\normalfont\scshape %
-%    FIXME <<Название>>}
-\topic{\normalfont\scshape<<Оценка линейного искажающего оператора в задаче восстановления изображения>>}
+\title{Бакалаврская работа}
+\topic{Оценка линейного искажающего оператора в задаче \\ восстановления изображения}%\normalfont\scshape 
 
-\coursenum{01.04.04}
+\coursenum{01.03.04}
 \course{Прикладная математика}
 %\masterprog{Математические методы и моделирование\\ \>\ \ в естественнонаучной и технической сферах}
 \author{Терентьев И.~В.}
 \group{ВМ-40}
-
+\authorFullName{Терентьев Иван Владимирович}
 %\apname{Прокофьев А.А.}
 
-\sa {Умняшкин С.~В.}
+\sa {Умняшкин С.~В.}l
 \sastatus{профессор, д.ф.-м.н.}
 \city{Москва}
 \date{2018}
 
-\maketitle
+{\fontsize{11pt}{14pt}\maketitle}
 
-\tableofcontents
+{\fontsize{12pt}{14}\tableofcontents}
 
 \intro
 
 Льем воду.
 
-Так как нужно 60-80 страниц.
+Так как нужно 25-30+ страниц.
 
 А это нелегко без нее.
 
 \input{chapter1_theory.tex}
-
-\chapter{Оценка линейного искажающего оператора}
-
-
-\chapter{Результаты экспериментов}
-
 
 \conclusion
 

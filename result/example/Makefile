@@ -1,2 +1,2 @@
 main:
-	pdflatex --file-line-error-style diploma_2018.tex
+	pdflatex --file-line-error-style -output-directory build diploma_2018.tex

@@ -17,6 +17,12 @@
 \newcommand\bachelor@the{\default@the}
 \bachelor@the
 
+\def\authorFullName#1{\gdef\@authorFullName{#1}}\authorFullName{}
+\renewcommand\courselabel{\cyr\cyrp\cyro\ \cyrn\cyra\cyrp\cyrr\cyra\cyrv\cyrl\cyre\cyrn\cyri\cyryu}
+\renewcommand\studentname{\cyr\CYRS\cyrt\cyru\cyrd\cyre\cyrn\cyrt}
+\renewcommand\studentlabel{\studentname\hspace{6cm}}
+\renewcommand\saname{\cyr\CYRR\cyru\cyrk\cyro\cyrv\cyro\cyrd\cyri\cyrt\cyre\cyrl\cyrsftsn}
+
 \if@titlepage\renewcommand\maketitle[1][]{
 \ifthenelse{\equal{#1}{en}}{\@titlepage@entrue}{\@titlepage@enfalse}
 \if@titlepage@en
@@ -40,13 +46,13 @@
 \ifundeflength\secondskip{1.5cm}
 \ifundeflength\thirdskip{1ex}
 \ifundeflength\fourthskip{1ex}
-\ifundeflength\fifthskip{2cm}
+\ifundeflength\fifthskip{4.5cm}
 \ifundeflength\sixthskip{1.5ex}
 
 \setlength\fieldhshift{8.5cm}
 
-\def\titlefont{\Large\bfseries}
-\def\topiclabelfont{\large}
+\def\titlefont{\large}%\bfseries
+%\def\topiclabelfont{\large}
 \def\topicfont{\large\bfseries}
 
 \def\workname{\CYRR\cyra\cyrb\cyro\cyrt\cyra}
@@ -62,19 +68,21 @@
 %{\@approved}
 \vskip\secondskip
 \begin{center}
+  {\@authorFullName}
+  \vskip\thirdskip
   {\titlefont\@title}
   \vskip\thirdskip
-  {\topiclabelfont\topiclabel\ }
-  {\topicfont\@topic}
+  {\titlefont\courselabel\ \@coursenum\ <<\@course>>}
   \vskip\fourthskip\normalfont
-  {\courselabel\ \@coursenum~--\ \@course}
+  %{\topiclabelfont\topiclabel}
+  {\topicfont\@topic}
 \end{center}
 
 \vskip\fifthskip
 \begin{tabbing}
   \studentlabel\=\makebox[\fieldhshift][l]{\hrulefill\ \@author}\\[\sixthskip]
   \ifx\@sa\empty\else\diplomafield{sa}\\[\sixthskip]\fi
-  \ifx\@sasnd\empty\else\diplomafield{sasnd}\\[\sixthskip]\fi
+  %\ifx\@sasnd\empty\else\diplomafield{sasnd}\\[\sixthskip]\fi
 \end{tabbing}
 \vfill
 \begin{center}
