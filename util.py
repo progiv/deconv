@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-from scipy.signal import convolve2d #fftconvolve
+from scipy.signal import convolve2d, fftconvolve
 from scipy.ndimage import filters
 from scipy.optimize import OptimizeResult
 from numpy.fft import fftn, ifftn
@@ -9,6 +9,8 @@ from itertools import chain
 from skimage.draw import line_aa
 from skimage.measure import compare_psnr
 from math import sin, cos, pi, factorial
+
+from richardson_lucy import richardson_lucy_matlab
 
 def zero_pad(image, shape, position='corner'):
     """
@@ -323,52 +325,7 @@ def compare_psnr_crop(im_true, im_test, crop_area=100, **kwargs):
         return compare_psnr(im_true[crop_area[0]:crop_area[1], crop_area[2]:crop_area[3]],
                             im_test[crop_area[0]:crop_area[1], crop_area[2]:crop_area[3]], **kwargs)
 
-"""
-def minimize_grad(fun, x0, grad=None, alpha=3, ftol = 1e-9, maxit=50, disp=False):
-    def gradient(x, step=1):
-        "suppose x is of size 2"
-        df = np.zeros(x.shape)
-        for coord in range(x.size):
-            dx = np.zeros(x.shape)
-            dx[coord] = step
-            df[coord] = (fun(x + dx) - fun(x - dx)) / (2 * step)
-        return df
-    def gradient2(x):
-        fval = np.zeros((3,3))
-        for dy in range(-1, 2):
-            for dx in range(-1, 2):
-                if not(dx == 0 and dy == 0):
-                    fval[dy+1, dx+1] = fun(x+np.array([dx, dy]))
-        sobel = np.array([[-1, 0, 1],
-                          [-2, 0, 2],
-                          [-1, 0, 1]])
-        scale = np.sum(np.abs(sobel))
-        dfdy = np.sum(fval * sobel.T)
-        dfdx = np.sum(fval * sobel)
-        G = np.array([dfdx, dfdy])
-        return G# / np.sum(np.abs(G))
-    
-    if grad is None:
-        grad = gradient2
-    
-    fin = False
-    x = x0
-    prev_f = fun(x)
-    iterations = 0
-    while not fin:
-        iterations += 1
-        df = grad(x)
-        if disp:
-            print(x, alpha, df)
-        x = x - alpha*df
-        #alpha *= .7
-        cur_f = fun(x)
-        if iterations == maxit or np.sum(np.abs(df))<ftol:#abs(cur_f - prev_f) < ftol:
-            fin = True
-        prev_f = cur_f
-    return OptimizeResult(x=x, nit=iterations)
-"""
-def minimize_grad(fun, x0, grad=None, alpha=3, ftol = 1e-9, xtol=1e-4, maxit=50, disp=False):
+def minimize_grad(fun, x0, grad=None, alpha=3, ftol = 1e-9, xtol=1e-4, maxiter=50, disp=False):
     def gradient(x, step=1):
         """suppose x is of size 2"""
         df = np.zeros(x.shape)
@@ -425,8 +382,9 @@ def minimize_grad(fun, x0, grad=None, alpha=3, ftol = 1e-9, xtol=1e-4, maxit=50,
                 lamb *= -1/2
         #alpha *= .7
         #cur_f = fun(x)
-        print(prev_x, x)
-        if iterations >= maxit or np.sum(np.abs(df))<ftol or np.sum(np.abs(prev_x-x))< xtol:
+        if disp:
+            print(prev_x, x)
+        if iterations >= maxiter or np.sum(np.abs(df))<ftol or np.sum(np.abs(prev_x-x))< xtol:
             fin = True
         prev_x = x
         prev_f = cur_f
@@ -434,3 +392,35 @@ def minimize_grad(fun, x0, grad=None, alpha=3, ftol = 1e-9, xtol=1e-4, maxit=50,
 
 def vec_len(x):
     return np.sqrt(np.sum(x**2))
+
+def second_point(x2, dist=0, eps=1e-16):
+    n = np.array([x2[1], -x2[0]])
+    n_len = vec_len(n)
+    if n_len<eps:
+        n = eps
+    else:
+        n = n/vec_len(n)
+    mid = x2 / 2
+    return mid + n*dist
+
+def funcToMinimizeCurved(xy, I_blurred, crop=100, *args, **kwargs):
+    psf = bezier_psf2(xy, n=100)
+    restored = richardson_lucy_matlab(I_blurred, psf, *args, **kwargs)
+    I_restored = restored['image']
+    if 'useFFT' in kwargs and kwargs['useFFT']:
+        df = fftconvolve(I_restored, psf, 'same') - I_blurred
+    else:
+        df = convolve2d(I_restored, psf, 'same') - I_blurred
+    return np.mean(np.square(df[crop:-crop, crop:-crop]))
+
+def funcToMinimizeCurved2(xy1, xy2, I_blurred, crop=100, *args, **kwargs):
+    xy = np.concatenate((np.array(xy1), np.array(xy2)))
+    return funcToMinimizeCurved(xy=xy, I_blurred=I_blurred, crop=crop, *args, **kwargs)
+
+def funcToMinimizeCurved3(xy2, xy1, I_blurred, crop=100, *args, **kwargs):
+    xy = np.concatenate((np.array(xy1), np.array(xy2)))
+    return funcToMinimizeCurved(xy=xy, I_blurred=I_blurred, crop=crop, *args, **kwargs)
+
+def funcToMinimizeCurvedNormal(dist, xy2, I_blurred, crop=100, *args, **kwargs):
+    xy = second_point(xy2, dist)
+    return funcToMinimizeCurved2(xy1=xy, xy2=xy2, I_blurred=I_blurred, crop=crop, *args, **kwargs)
