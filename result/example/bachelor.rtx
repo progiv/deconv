@@ -20,7 +20,7 @@
 \def\authorFullName#1{\gdef\@authorFullName{#1}}\authorFullName{}
 \renewcommand\courselabel{\cyr\cyrp\cyro\ \cyrn\cyra\cyrp\cyrr\cyra\cyrv\cyrl\cyre\cyrn\cyri\cyryu}
 \renewcommand\studentname{\cyr\CYRS\cyrt\cyru\cyrd\cyre\cyrn\cyrt}
-\renewcommand\studentlabel{\studentname\hspace{6cm}}
+\renewcommand\studentlabel{\studentname\hspace{6.5cm}}
 \renewcommand\saname{\cyr\CYRR\cyru\cyrk\cyro\cyrv\cyro\cyrd\cyri\cyrt\cyre\cyrl\cyrsftsn}
 
 \if@titlepage\renewcommand\maketitle[1][]{
