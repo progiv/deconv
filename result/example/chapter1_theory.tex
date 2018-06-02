@@ -1,41 +1,81 @@
 \chapter{Обзор проблематики восстановления изображений}
 
 \section{Модель искажения}
-
 Изображение~--- это двумерная проекция трёхмерной сцены. С помощью записывающей системы(камеры) она проецируется на двумерную область~--- изображение. Под изображением понимаем двумерный дискретный сигнал $f(x,y)$, где $0\leq x \leq M$, $0\leq y\leq N$ ($M$, $N$~--- ширина и высота изображения соответственно). В данной работе рассматриваем только обработку полутоновых изображений со значениями яркости $0\leq f(x,y)\leq 1$.
 
-\tikzset{%
-  block/.style    = {draw, thick, rectangle, minimum height = 3em,
-	minimum width = 3em, node distance = 3cm},
-  sum/.style      = {draw, circle, node distance = 3cm}, % Adder
-  input/.style    = {coordinate}, % Input
-  output/.style   = {coordinate, node distance = 3cm} % Output
-}
-\begin{figure}
-	\centering
-	\begin{tikzpicture}[auto, thick, node distance=2cm, >=triangle 45]
-	\draw
-		node [input, name=in] {} 
-		node [block, right of=in] (hxy) {$h(x,y)$}
-		node [sum, right of=hxy] (sum1) {\Large$+$}
-		node [input, above of=sum1] (noize) {}
-		node [output, right of=sum1] (out){$g(x,y)$};
-	\draw[->](in)     -- node {$f(x,y)$}(hxy);
-	\draw[->](hxy)    -- node {$s(x,y)$}(sum1);
-	\draw[->](noize)  -- node {$\eta(x,y)$}(sum1);
-	\draw[->](sum1)   -- node {$g(x,y)$}(out);
-	\end{tikzpicture}
-	\caption{Линейная система искажения изображения}
-	\label{distortionScheme}
+\begin{figure}[h]
+	\tikzset{%
+		block/.style    = {draw, thick, rectangle, minimum height = 3em,
+			minimum width = 3em, node distance = 3cm},
+		sum/.style      = {draw, circle, node distance = 3cm}, % Adder
+		input/.style    = {coordinate}, % Input
+		output/.style   = {coordinate, node distance = 3cm} % Output
+	}
+    \centering
+    \begin{tikzpicture}[auto, thick, node distance=2cm, >=triangle 45]
+    \draw
+        node [input, name=in] {} 
+        node [block, right of=in] (hxy) {$h(x,y)$}
+        node [sum, right of=hxy] (sum1) {\Large$+$}
+        node [input, above of=sum1] (noize) {}
+        node [output, right of=sum1] (out){$g(x,y)$};
+    \draw[->](in)     -- node {$f(x,y)$}(hxy);
+    \draw[->](hxy)    -- node {$s(x,y)$}(sum1);
+    \draw[->](noize)  -- node {$\eta(x,y)$}(sum1);
+    \draw[->](sum1)   -- node {$g(x,y)$}(out);
+    \end{tikzpicture}
+    \caption{Линейная система искажения изображения}
+    \label{fig:distortionScheme}
 \end{figure}
 
-Пусть $f(x,y)$~--- неискажённое изображение; $g(x,y)$~--- изображение подвергнутое искажению; $h(x,y)$~--- импульсная характеристика (ИХ) оператора искажения; 
-Тогда процесс искажения в пространственной области представим в виде
+Пусть $f(x,y)$~--- неискажённое изображение; $g(x,y)$~--- изображение подвергнутое искажению; $h(x,y)$~--- импульсная характеристика (ИХ) оператора искажения; $\hat{f}(x,y)$~--- оценка неискажённого изображения $f(x,y)$; $\eta(x,y)$~--- некоррелированный гауссов шум. Обозначим $F(u,v)$, $G(u,v)$, $H(u,v)$, $N(u,v)$ Фурье-образы функций $f(x,y)$, $g(x,y)$, $h(x,y)$ и $\eta(x,y)$ соответственно, полученные дискретным преобразованием Фурье\cite[стр.~332]{gonsalesDigital2012}.
+Допускаем, что процесс формирования искажённого изображения $g(x, y)$ линейный и его можно описать с помощью линейной дискретной системы \cite[стр.~403]{gonsalesDigital2012}
 \begin{equation}\label{eq:distortion}
-g(x, y) = h(x,y) *\!*f(x,y) + \eta(x,y)
+g(x, y) = h(x,y) *\!*f(x,y) + \eta(x,y),
 \end{equation}
- $\hat{f}(x,y)$~--- оценка неискажённого изображения $f(x,y)$; $\eta(x,y)$~--- некореллированный гауссов шум.
-Обозначим $F(u,v), G(u,v), H(u,v), N(u,v)$ Фурье-образы функций $f(x,y), g(x,y), h(x,y)$ и $\eta(x,y)$ соответственно, полученные дискретным преобразованием Фурье \cite[стр.~332]{gonsalesDigital}
+
+где $<*\!*>$~--- операция двумерной свёртки изображения $f(x,y)$ размером $M\times N$ с импульсной характеристикой фильтра $h(x,y)$ размером $m\times n$, которая описывается следующим выражением~\cite[стр.~298]{gonsalesDigital2012}:
+
+\begin{equation}
+h(x,y) *\!* f(x,y) = \sum_{s=-a}^{a}\sum_{t=-b}^{b}h(s,t)f(x-s, y-t),
+\end{equation}
+где $a=(m-1)/2$ и $b = (n-1)/2$.
+
+\begin{definition}
+Двумерная импульсная характеристика (или функция рассеяния точ-
+ки, ФРТ) — это реакция двумерной дискретной системы на единичный импульс.
+$$\delta(n,m) = 
+	\begin{cases}
+		1, n=m=0\\
+		0, n\ne 0, m\ne 0
+	\end{cases}$$.
+\end{definition}
+
+Таким образом, процесс искажения изображения можно описать как результат взаимодействия исходного изображения $f(x, y)$ с линейно-дискретной системой, изображённой на рисунке~\ref{fig:distortionScheme}. Сигнал $f(x, y)$ подвергается воздействию оператора смаза с импульсной характеристикой $h(x, y)$ , которая обычно не известна заранее. Из-за внешних факторов и несовершенства съёмки к искажению добавляется шум, который считается некоррелированным случайным процессом, также некоррелированным с изображением.
+В частотной области процесс искажения (\ref{eq:distortion}) выглядит следующим образом:
+
+\begin{equation}\label{eq:distortionFourier}
+G(u,v) = H(u,v)\cdot F(u,v) + N(u,v),
+\end{equation}
+
+так как операция свёртки в пространственной области эквивалентна умножению в частотной области\cite[стр.~39]{basicsOfDigitalDataProcessing2016Umnyashkin}
+
+Смаз на изображении всегда возникает при относительном движении камеры и объекта. Для определения импульсной характеристики оператора искажения, рассмотрим случай, когда камера перемещается с постоянной горизонтальной скоростью относительно сцены. В дискретном случае~\cite{iterableImageRestorationBiemonLangddeik}:
+\begin{equation}\label{eq:horizontalBlurPsf}
+	h(x,y) = 
+		\begin{cases}
+			\frac{1}{L+1}, & 0 \leq y \leq L, x=0\\
+			0              & \text{в остальных случаях}
+		\end{cases},
+\end{equation}
+
+где L~--- величина смаза, то есть количество точек(пикселей), на которое сместилось изображение в , соответствующих одной точке объекта. Выражение (\ref{eq:horizontalBlurPsf})~--- один из вариантов функции рассеяния точки.
+
+Частотная характеристика данного оператора искажения определяется выражением~\cite{iterableImageRestorationBiemonLangddeik}:
+
+\begin{equation}\label{eq:horizontalBlurIRFourier}
+H(u,v) = \frac{1}{L+1}e^{-i\frac{L\pi}{N}m}\frac{\sin\frac{\pi(L+1)u}{N}}{\sin\frac{\pi u}{N}}
+\end{equation}
 
 
 \section{Методы восстановления изображения}
@@ -49,26 +89,3 @@ g(x, y) = h(x,y) *\!*f(x,y) + \eta(x,y)
 
 \section{Постановка задачи оценки искажающего оператора}
 
-
-
-\chapter{Метод оценки линейного искажающего оператора}
-
-\section{Кепстральный метод оценки линейного оператора}
-\subsection{Нахождение параметров искажения}
-\subsection{Уточнение параметров искажения}
-
-\section{Нахождение парметров криволинейного искажающего оператора}
-\subsection{Представление криволинейного искажающего оператора}
-\subsection{Первое приближение}
-\subsection{Второе приближение}
-\subsection{Уточнение параметров}
-\section{Вывод}
-
-
-
-\chapter{Результаты экспериментов}
-\section{Оценка линейного искажающего оператора}
-\section{Оценка криволинейного искажающего оператора}
-\subsection{Искусственные искажения}
-\subsection{Искажения <<от руки>>}
-\section{Вывод}
