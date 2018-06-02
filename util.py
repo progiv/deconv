@@ -10,6 +10,8 @@ from skimage.draw import line_aa
 from skimage.measure import compare_psnr
 from math import sin, cos, pi, factorial
 
+from PIL import Image
+
 from richardson_lucy import richardson_lucy_matlab
 
 def zero_pad(image, shape, position='corner'):
@@ -424,3 +426,8 @@ def funcToMinimizeCurved3(xy2, xy1, I_blurred, crop=100, *args, **kwargs):
 def funcToMinimizeCurvedNormal(dist, xy2, I_blurred, crop=100, *args, **kwargs):
     xy = second_point(xy2, dist)
     return funcToMinimizeCurved2(xy1=xy, xy2=xy2, I_blurred=I_blurred, crop=crop, *args, **kwargs)
+
+def npArrayToPng(a, fname):
+    #Rescale to 0-255 and convert to uint8
+    rescaled = (255.0 / a.max() * (a - a.min())).astype(np.uint8)
+    Image.fromarray(rescaled).save(fname)

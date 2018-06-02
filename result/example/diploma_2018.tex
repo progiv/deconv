@@ -2,7 +2,7 @@
 12pt,
 bachelor,    % тип документа
 %natbib,      % использовать пакет natbib для "сжатия" цитирований
-%subf,        % использовать пакет subcaption для вложенной нумерации рисунков
+subf,        % использовать пакет subcaption для вложенной нумерации рисунков
 href,        % использовать пакет hyperref для создания гиперссылок
 %colorlinks,  % цветные гиперссылки
 %fixint,     % включить прямые знаки интегралов
@@ -56,7 +56,9 @@ sorting=none
 % Включать подсекции в оглавление
 \setcounter{tocdepth}{2}
 
-\graphicspath{{fig/}}
+\graphicspath{{../../pic/}}
+% without build folder
+%\graphicspath{{../pic/}}
 
 \usepackage{comment}
 \usepackage{textcomp}
