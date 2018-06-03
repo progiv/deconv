@@ -429,5 +429,5 @@ def funcToMinimizeCurvedNormal(dist, xy2, I_blurred, crop=100, *args, **kwargs):
 
 def npArrayToPng(a, fname):
     #Rescale to 0-255 and convert to uint8
-    rescaled = (255.0 / a.max() * (a - a.min())).astype(np.uint8)
+    rescaled = (255.0 / (a.max()-a.min()) * (a - a.min())).astype(np.uint8)
     Image.fromarray(rescaled).save(fname)

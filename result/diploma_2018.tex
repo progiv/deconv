@@ -1,0 +1,142 @@
+\documentclass[%
+12pt,
+bachelor,    % тип документа
+%natbib,      % использовать пакет natbib для "сжатия" цитирований
+subf,        % использовать пакет subcaption для вложенной нумерации рисунков
+href,        % использовать пакет hyperref для создания гиперссылок
+%colorlinks,  % цветные гиперссылки
+%fixint,     % включить прямые знаки интегралов
+%substylefile = bachelor.rtx
+]{disser}%twoside, 
+
+\usepackage[a4paper, includefoot, left=3cm, right=1cm, top=2cm, bottom=2cm, headsep=1cm, footskip=1cm]{geometry}
+
+\usepackage[intlimits]{amsmath}
+\usepackage{amssymb, amsfonts}
+
+\usepackage[T2A]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english,russian]{babel}
+\ifpdf\usepackage{epstopdf}\fi
+\usepackage[autostyle]{csquotes}
+
+% Шрифт Times в тексте как основной
+%\usepackage{tempora}
+% альтернативный пакет из дистрибутива TeX Live
+%\usepackage{cyrtimes}
+
+% Шрифт Times в формулах как основной
+%\usepackage[varg,cmbraces,cmintegrals]{newtxmath}
+% альтернативный пакет
+%\usepackage[subscriptcorrection,nofontinfo]{mtpro2}
+
+\usepackage[%
+style=gost-numeric,
+backend=biber,
+language=auto,
+hyperref=auto,
+autolang=other,
+sorting=none
+]{biblatex}
+\addbibresource{biblio.bib}
+
+% Плавающие рисунки "в оборку".
+\usepackage{wrapfig}
+
+% Номера страниц снизу и по центру
+%\pagestyle{footcenter}
+\chapterpagestyle{footcenter}
+
+% Точка с запятой в качестве разделителя между номерами цитирований
+%\setcitestyle{semicolon}
+
+% Использовать полужирное начертание для векторов
+\let\vec=\mathbf
+
+% Включать подсекции в оглавление
+\setcounter{tocdepth}{2}
+
+\graphicspath{{../pic/}}
+
+\usepackage{comment}
+\usepackage{textcomp}
+\usepackage{tikz}
+\usetikzlibrary{shapes,arrows}
+
+\usepackage{setspace}
+\onehalfspacing
+
+% вставлять используемые пакеты сюда
+% hyperref должен быть самым последним, иначе будут  баги с \chapter \section и \subsection
+
+%\usepackage[
+%pdfstartview   = FitH,
+%bookmarksopen  = true,bookmarksopenlevel=0,
+%plainpages     = false,pdfpagelabels,
+%pagebackref    = false,
+%pdftoolbar     = false,
+%unicode,
+%pdftex,
+%hidelinks
+%]{hyperref}
+
+% Русские больше и меньше либо равно
+\renewcommand{\leq}{\leqslant}
+\renewcommand{\geq}{\geqslant}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\conv}{*\!*}
+
+\newtheorem{definition}{Определение}
+
+% Больше переносов, меньше overflow hbox
+%\tolerance=1000
+%\hyphenpenalty=1000
+
+\begin{document}
+    \institution{%
+        МИНОБРНАУКИ РОССИИ \\
+        Федеральное государственное автономное образовательное учреждение высшего образования\\
+        <<Национальный исследовательский университет\\
+        <<Московский институт электронной техники>>\\
+        Факультет Микроприборов и технической кибернетики\\% (МПиТК)
+        Кафедра высшей математики №1% (ВМ-1)
+    }
+\title{Бакалаврская работа}
+\topic{Оценка линейного искажающего оператора в задаче \\ восстановления изображения}%\normalfont\scshape 
+
+\coursenum{01.03.04}
+\course{Прикладная математика}
+%\masterprog{Математические методы и моделирование\\ \>\ \ в естественнонаучной и технической сферах}
+\author{~Терентьев И.~В.}
+\group{ВМ-40}
+\authorFullName{Терентьев Иван Владимирович}
+%\apname{Прокофьев А.А.}
+
+%Научник
+\sa {Умняшкин С.~В.}
+\sastatus{профессор, д.ф.-м.н.}
+\city{Москва}
+\date{2018}
+
+\maketitle
+
+%{\fontsize{13pt}{17}}
+\tableofcontents
+% MAIN BODY
+\input{intro.tex}
+\input{chapter1_theory.tex}
+\input{chapter2_experiments.tex}
+\input{chapter3_results.tex}
+\input{conclusion.tex}
+
+%\bibliographystyle{ugost2008}
+%\bibliography{biblio}
+% Список литературы
+\printbibliography[heading=bibintoc]
+
+% Приложения
+%\appendix
+%\input{a}
+
+\end{document}
