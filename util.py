@@ -431,3 +431,18 @@ def npArrayToPng(a, fname):
     #Rescale to 0-255 and convert to uint8
     rescaled = (255.0 / (a.max()-a.min()) * (a - a.min())).astype(np.uint8)
     Image.fromarray(rescaled).save(fname)
+
+def show_and_save_image(image=None, plot_arr=None, fname=None):#, size=(5,5)):
+    fig = plt.figure(frameon=False)
+    fig.set_size_inches(5,5)
+    ax = plt.Axes(fig, [0., 0., 1., 1.])
+    ax.set_axis_off()
+    fig.add_axes(ax)
+
+    if image is not None:
+        ax.imshow(image, 'gray')
+    if plot_arr:
+        for plot_args in plot_arr:
+            ax.plot(*plot_args)
+    if fname:
+        fig.savefig(fname)

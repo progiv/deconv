@@ -9,7 +9,7 @@ def col_correlation(image):
     return pearsonr(image[:,1:].ravel(), image[:,:-1].ravel())[0]
 
 
-def corelucy(Y, psf, dampar22, wI, readout, eps=1e-9, convolvemethod=convolve2d):
+def corelucy(Y, psf, dampar22, wI, readout, eps=2.22e-16, convolvemethod=convolve2d):
     """
     CORELUCY Accelerated Damped Lucy-Richarson Operator.
     Calculates function that when used with the scaled projected array
@@ -33,10 +33,10 @@ def corelucy(Y, psf, dampar22, wI, readout, eps=1e-9, convolvemethod=convolve2d)
         g = np.minimum(g,1);
         G = (g**(gm-1))*(gm-(gm-1)*g);
         ImRatio = 1 + G * (AnEstim - 1);
-    return ImRatio
+    return ImRatio #fftn(ImRatio)
 
 def richardson_lucy_matlab(image, psf, iterations=50, dampar=0, weight=None, readout=0, 
-                           eps=1e-16, clip=True, useFFT=False):
+                           eps=1e-16, clip=True, useFFT=True):
     """ Richardson-Lucy deconvolution.
 
     Parameters
@@ -80,7 +80,7 @@ def richardson_lucy_matlab(image, psf, iterations=50, dampar=0, weight=None, rea
     correlation_Y = [row_correlation(image)]
     for k in range(lambd, lambd + iterations):
         # 3.a Make an image predictions for the next iteration
-        if k > 2:
+        if k > 1:
             lambd = (internal[:,0].T.dot(internal[:,1])) / (internal[:,1].T.dot(internal[:,1]) + eps) # (scalar division)
             lambd = np.maximum(np.minimum(lambd, 1), 0) # stability enforcement saturation
         Y = np.maximum(prev_image + lambd*(prev_image - prev_prev_image), 0) # plus positivity constraint
