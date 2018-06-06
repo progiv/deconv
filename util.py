@@ -409,10 +409,10 @@ def funcToMinimizeCurved(xy, I_blurred, crop=100, *args, **kwargs):
     psf = bezier_psf2(xy, n=100)
     restored = richardson_lucy_matlab(I_blurred, psf, *args, **kwargs)
     I_restored = restored['image']
-    if 'useFFT' in kwargs and kwargs['useFFT']:
-        df = fftconvolve(I_restored, psf, 'same') - I_blurred
-    else:
-        df = convolve2d(I_restored, psf, 'same') - I_blurred
+    #if 'useFFT' in kwargs and kwargs['useFFT']:
+    df = fftconvolve(I_restored, psf, 'same') - I_blurred
+    #else:
+    #    df = convolve2d(I_restored, psf, 'same') - I_blurred
     return np.mean(np.square(df[crop:-crop, crop:-crop]))
 
 def funcToMinimizeCurved2(xy1, xy2, I_blurred, crop=100, *args, **kwargs):

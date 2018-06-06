@@ -2,36 +2,51 @@
 \section{Оценка линейного искажающего оператора}
 \begin{figure}[h!]
 	\centering
-	\begin{subfigure}[b]{0.475\textwidth}
+	\begin{subfigure}[t]{0.32\textwidth}
 		\centering
 		\includegraphics[width=\linewidth]{../liftingbody}
 		\caption{исходное изображение}
 		\label{fig:liftingbody}
 	\end{subfigure}
 	\hfill
-	\begin{subfigure}[b]{0.475\textwidth}
+	\begin{subfigure}[t]{0.32\textwidth}
+		\centering
+		\includegraphics[width=\linewidth]{linear-lifting-psf}
+		\caption{искажающий оператор}
+		\label{fig:liftingbodyPsf}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}[t]{0.32\textwidth}
 		\centering
 		\includegraphics[width=\linewidth]{linear-lifting-blurred}
 		\caption{Смазанное изображение. [16.67; 24.94]}
 		\label{fig:liftingBlurred}
 	\end{subfigure}
 \vskip\baselineskip
-	\begin{subfigure}[b]{0.475\textwidth}
+	\begin{subfigure}[t]{0.32\textwidth}
 	\centering
 	\includegraphics[width=\linewidth]{linear-restored-initial-approx}
-	\caption{Первое приближение(по кепстру) [17; 25], PSNR=27.26дБ}
+	\caption{Первое приближение(по кепстру) [17; 25], PSNR=27.42дБ}
 	\label{fig:liftingbodyInitial}
 	\end{subfigure}
 	\hfill
-	\begin{subfigure}[b]{0.475\textwidth}
+	\begin{subfigure}[t]{0.32\textwidth}
 		\centering
 		\includegraphics[width=\linewidth]{linear-restored-final}
-		\caption{уточнённая оценка. [17.0006 25.0022], PSNR=27.26дБ}
+		\caption{уточнённая оценка. [17.0044 25.0023], PSNR=27.42дБ}
 		\label{fig:liftingFinal}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}[t]{0.32\textwidth}
+		\centering
+		\includegraphics[width=\linewidth]{linear-restored-final}
+		\caption{Восстановление с <<правильной ИХ>> [17.0044 25.0023], PSNR=27.61дБ}
+		\label{fig:liftingReal}
 	\end{subfigure}
 	\caption{Восстановление изображения подвергнутого линейному смазу}
 	\label{fig:linear}
 \end{figure}
+
 Рассмотрим смаз длины 30, под углом $56.25^\circ$. Как видим оценка на основе кепстра сразу дала удовлетворительный результат, при этом дальнейшая попытка улучшения качества восстановления результат практически не изменила.
 
 \section{Оценка криволинейного искажающего оператора}
@@ -68,7 +83,8 @@
 	\caption{Восстановление изображения подвергнутого смазу оператором  оператором \ref{fig:oneDimIterPsfTrue}}
 	\label{fig:oneDimIter}
 \end{figure}
-На рис.~\ref{fig:oneDimIter} показаны результаты деконволюции смазанного изображения с ИХ на различных этапах оценки. Как видим уже начальное приближение рис.~\ref{fig:oneDimIterInitial} повышает резкость. Набольший вклад в качество восстановления даёт второе приближение рис.~\ref{fig:oneDimIterSecond}. Последующее уточнение не сильно влияет на результат.
+
+На рис.~\ref{fig:oneDimIter} показаны результаты деконволюции смазанного изображения с ИХ на различных этапах оценки. Как видим уже начальное приближение рис.~\ref{fig:oneDimIterInitial} повышает резкость. Набольший вклад в качество восстановления даёт второе приближение рис.~\ref{fig:oneDimIterSecond}. Последующее уточнение не сильно влияет на результат. При этом итоговое изображение всего на $0.19$дБ хуже, чем восстановленное с оператором, который был применён для искажения.
 
 \begin{figure}[h!]
 	\centering
@@ -88,6 +104,7 @@
 	\caption{ИХ: действительная, и её оценка}
 	\label{fig:oneDimIterPsf}
 \end{figure}
+
 Заметим, что оценка(рис.~\ref{fig:oneDimIterPsfFound}) искажающего оператора достаточно точно воспроизводит использованную для искажения ИХ(рис.~\ref{fig:oneDimIterPsfTrue}).
 
 \subsection{Искажения <<от руки>>}
@@ -146,37 +163,53 @@
 	\hfill
 	\begin{subfigure}[t]{0.475\textwidth}
 		\centering
-		\includegraphics[width=\linewidth]{one-dim-drawn-restored-initial-approx}
-		\caption{восстановленное, первое приближение (0;0) (26;17) (52;34), PSNR=19.18дБ}
+		\includegraphics[width=\linewidth]{one-dim-drawn-lifting-restored-initial-approx}
+		\caption{восстановленное, первое приближение (0;0) (26;17) (52;34), PSNR=19.4дБ}
 		\label{fig:oneDimDrawnLiftingInitial}
 	\end{subfigure}
 
 
 	\begin{subfigure}[t]{0.475\textwidth}
 		\centering
-		\includegraphics[width=\linewidth]{one-dim-drawn-restored-second-approx}
-		\caption{второе приближение (0;0), (40.66;-5.41), (52;34), PSNR=22.25дБ}
+		\includegraphics[width=\linewidth]{one-dim-drawn-lifting-restored-second-approx}
+		\caption{второе приближение (0;0), (40.83;-7.21), (52;34), PSNR=22.41дБ}
 		\label{fig:oneDimDrawnLiftingSecond}
 	\end{subfigure}
 	\hfill
 	\begin{subfigure}[t]{0.475\textwidth}
 		\centering
-		\includegraphics[width=\linewidth]{one-dim-drawn-restored-final}
-		\caption{уточнение градиентным спуском (0,0), (40.65;-5.43), (52, 34), PSNR=22.37}
+		\includegraphics[width=\linewidth]{one-dim-drawn-lifting-restored-final}
+		\caption{уточнение градиентным спуском (0,0), (41.82;-7.21), (52, 34), PSNR=22.41}
 		\label{fig:oneDimDrawnLiftingFinal}
 	\end{subfigure}
 	\caption{Восстановление изображения искажённого оператором \ref{fig:drawnPsf3}}
 	\label{fig:oneDimDrawnLifting}
 \end{figure}
+
 На рисунке \ref{fig:oneDimDrawnLifting} изображён процесс восстановления изображения, искажённого нарисованным <<от руки>> оператором. Как и в предыдущем случае наибольший вклад в качество восстановленного изображения внесли первое и второе приближение оценки параметров оператора.
+
+На рисунке \ref{fig:oneDimDrawnLiftingCostMatrix} показана диаграмма целевой функции, по которой видно, наличие локальных минимумов. Рисунок \ref{fig:oneDimDrawnLiftinfRealPsf}~--- изображение восстановленное с настоящей импульсной характеристикой, с использованием которой было сформировано смазанное изображение \ref{fig:oneDimDrawnLiftingBlurred}
 
 \begin{figure}[h!]
 	\centering
-	\includegraphics[width=0.4\linewidth]{one-dim-drawn-lifting-cost-function-grid}
-	\caption{Значения целевой функции в зависимости от координат второй точки}
-	\label{fig:drawnCostFunction}
+	\begin{subfigure}[t]{0.475\textwidth}
+		\centering
+		\includegraphics[width=\linewidth]{one-dim-drawn-lifting-cost-function-grid}
+		\caption{значения целевой функции от второй точки кривой}
+		\label{fig:oneDimDrawnLiftingCostMatrix}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}[t]{0.475\textwidth}
+		\centering
+		\includegraphics[width=\linewidth]{one-dim-drawn-lifting-restored-true-psf}
+		\caption{изображение восстановленное с <<правильной ИХ>> PSNR=26.51}
+		\label{fig:oneDimDrawnLiftinfRealPsf}
+	\end{subfigure}
+	\caption{значения целевой функции в зависимости от координат, восстановленное изображение}
+	%\label{fig:***}
 \end{figure}
-На рисунке~\ref{fig:drawnCostFunction} показано представление целевой функции в зависимости от координат второй точки$B_1$ кривой Безье. Как видим в данном случае так же большое количество локальных минимумов(тёмных пикселей окружённых светлыми).
+
+На рисунке~\ref{fig:oneDimDrawnLiftingCostMatrix} показано представление целевой функции в зависимости от координат второй точки$B_1$ кривой Безье. Как видим в данном случае так же большое количество локальных минимумов(тёмных пикселей окружённых светлыми).
 
 \begin{figure}[h!]
 	\centering
@@ -196,7 +229,8 @@
 	\caption{Искажающий оператор и его оценка кривой Безье}
 	\label{fig:drawnPsf3Est}
 \end{figure}
-Полученная оценка(рис.~\ref{fig:drawnPsf3Estimation}) искажающего оператора(рис.~\ref{fig:drawnPsf3Orig}) полученная из смазанного изображения хорошо описывает искажение и позовляет получить достаточно чётко восстановленное изображение.
+
+Полученная оценка(рис.~\ref{fig:drawnPsf3Estimation}) искажающего оператора(рис.~\ref{fig:drawnPsf3Orig}) полученная из смазанного изображения хорошо описывает искажение и позволяет достаточно точно восстановить изображение.
 \begin{comment}
 
 \begin{figure}[h!]
@@ -225,7 +259,7 @@
 \begin{enumerate}
 	\item Метод Люси-Ричардсона позволяет получить более качественный результат по сравнению с другими методами;
 	\item разработан метод оценки криволинейного искажающего оператора;
-	\item применение кепстрального представления позовляет определить параметры не только прямолинейного искажающего оператора, но и первое приближение для криволинейного оператора;
+	\item применение кепстрального представления позволяет определить параметры не только прямолинейного искажающего оператора, но и первое приближение для криволинейного оператора;
 	\item для повышения точности оценки параметров искажения следует использовать минимизацию функции ошибки, которая является <<плохой>> для градиентных методов, но поддаётся минимизации, с учётом модели искажения.
 	\item результат работы первого и второго приближения даёт приемлемый результат, тогда как попытки градиентными методами минимизации целевой функции на результат большого влияния не оказывают. Таким образом исключив последний этап можно значительно ускорить работу алгоритма с небольшими потерями в точности восстановления;
 \end{enumerate}

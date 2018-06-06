@@ -19,11 +19,13 @@ href,        % использовать пакет hyperref для создан�
 \usepackage[english,russian]{babel}
 \ifpdf\usepackage{epstopdf}\fi
 \usepackage[autostyle]{csquotes}
+%\usepackage[toc]{appendix}
 
 % Шрифт Times в тексте как основной
 \usepackage{tempora}
 % альтернативный пакет из дистрибутива TeX Live
 %\usepackage{cyrtimes}
+%\usepackage{pscyr}
 
 % Шрифт Times в формулах как основной
 %\usepackage[varg,cmbraces,cmintegrals]{newtxmath}
@@ -58,6 +60,7 @@ sorting=none
 
 \graphicspath{{../pic/}}
 
+\usepackage{import}
 \usepackage{comment}
 \usepackage{textcomp}
 \usepackage{tikz}
@@ -125,11 +128,11 @@ sorting=none
 %{\fontsize{13pt}{17}}
 \tableofcontents
 % MAIN BODY
-\input{intro.tex}
-\input{chapter1_theory.tex}
-\input{chapter2_experiments.tex}
-\input{chapter3_results.tex}
-\input{conclusion.tex}
+\subimport{.}{intro.tex}
+\subimport{.}{chapter1_theory.tex}
+\subimport{.}{chapter2_experiments.tex}
+\subimport{.}{chapter3_results.tex}
+\subimport{.}{conclusion.tex}
 
 %\bibliographystyle{ugost2008}
 %\bibliography{biblio}
@@ -137,7 +140,6 @@ sorting=none
 \printbibliography[heading=bibintoc]
 
 % Приложения
-%\appendix
-%\input{a}
+\subimport{.}{attachments.tex}
 
 \end{document}
